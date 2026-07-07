@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SquareC — підбір образу на літо</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="splash" id="splash">
+    <div class="splash-star">★</div>
+  </div>
+
+  <div class="topbar">
+    <div class="wordmark"><span class="star">★</span>SquareC</div>
+    <div class="subtag">---</div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- ===================== FUTBOLKI ===================== -->
+    <section id="tshirts-section">
+      <div class="section-head">
+        <div class="section-title">Футболки</div>
+        <div class="section-counter" id="tshirt-counter">01 / 09</div>
+      </div>
+
+      <div class="stage">
+        <button class="arrow-btn" onclick="prevItem('tshirt')" aria-label="Попередня футболка">&#8592;</button>
+        <div class="card-scene">
+          <div class="card-inner" id="tshirt-card" onclick="flipCard('tshirt')">
+            <div class="card-face front">
+              <span class="face-tag">перед</span>
+              <img id="tshirt-front-img" alt="Футболка, вид спереду">
+            </div>
+            <div class="card-face back">
+              <span class="face-tag">зад</span>
+              <img id="tshirt-back-img" alt="Футболка, вид ззаду">
+            </div>
+          </div>
+        </div>
+        <button class="arrow-btn" onclick="nextItem('tshirt')" aria-label="Наступна футболка">&#8594;</button>
+      </div>
+
+      <div class="dots" id="tshirt-dots"></div>
+      <div class="item-info" id="tshirt-info"></div>
+      <button class="info-btn" onclick="toggleDetails('tshirt')">?</button>
+      <div class="info-popup" id="tshirt-popup"></div>
+    </section>
+
+    <!-- ===================== SHORTS ===================== -->
+    <section id="shorts-section">
+      <div class="section-head">
+        <div class="section-title">Шорти</div>
+        <div class="section-counter" id="shorts-counter">01 / 05</div>
+      </div>
+
+      <div class="stage">
+        <button class="arrow-btn" onclick="prevItem('shorts')" aria-label="Попередні шорти">&#8592;</button>
+        <div class="card-scene">
+          <div class="card-inner" id="shorts-card" onclick="flipCard('shorts')">
+            <div class="card-face front">
+              <span class="face-tag">перед</span>
+              <img id="shorts-front-img" alt="Шорти, вид спереду">
+            </div>
+            <div class="card-face back">
+              <span class="face-tag">зад</span>
+              <img id="shorts-back-img" alt="Шорти, вид ззаду">
+            </div>
+          </div>
+        </div>
+        <button class="arrow-btn" onclick="nextItem('shorts')" aria-label="Наступні шорти">&#8594;</button>
+      </div>
+
+      <div class="dots" id="shorts-dots"></div>
+      <div class="item-info" id="shorts-info"></div>
+      <button class="info-btn" onclick="toggleDetails('shorts')">?</button>
+      <div class="info-popup" id="shorts-popup"></div>
+    </section>
+    <hr class="divider">
+
+    <!-- ===================== NOTE ===================== -->
+    <div class="note-box">
+      <div class="note-title">Пам'ятка</div>
+      <div class="note-line"><span class="glyph">&#8592; &#8594;</span> стрілочки для навігації</div>
+      <div class="note-line"><span class="glyph">&#8635;</span> клік на фото для зміни сторони</div>
+      <div class="note-line"><span class="glyph">?</span> клік на "?" для інформації про річ</div>
+    </div>
+
+  </div>
+
+  <audio id="bg-music" src="music.mp3" loop preload="none"></audio>
+  <button class="music-btn" id="music-btn" onclick="toggleMusic()">♪</button>
+
+<script>
+  // ---------- CONFIG ----------
+  const EXT = "jpg";
+
+  const state = {
+    tshirt: { count: 9, index: 0, flipped: false },
+    shorts: { count: 5, index: 0, flipped: false }
+  };
+
+  const itemInfo = {
+    tshirt: [
+      "Футболка від CROPP - index: 685HY-08X, colour: beige",
+      "Relaxed Fit футболка з вишивкою від HOUSE - index: 757KE-99X, colour: black",
+      "Футболка з вишивкою від FSBN - order: 889404, colour: gardenia",
+      "Футболка від COLIN'S - index: Cl1067743, colour: white",
+      "Технічна футболка від 4F - code: 4FWSS24TFTSM697, colour: black",
+      "Поло Paulos від Jack & Jones - index: 12136668, colour: white",
+      "XSIDE ACTIVE Футболка з коміром поло від LC WAIKIKI - code: S52617Z8-CVL, colour: black",
+      "XSIDE Футболка від LC WAIKIKI - code: S5KM75Z8-VXR, colour: beige",
+      "Футболка від Sinsay - index: 9331I-99X-M colour: black"
+    ],
+    shorts: [
+      "Шорти NFC Angel від F(A)RFIE - index/code: none, colour: black",
+      "Джинсові шорти від CROPP - index: 705DD-50J, colour: ice blue",
+      "Шорти від CROPP - index: 9036Y-91X, colour: olive",
+      "Спортивні шорти Karl від Jack & Jones - index: 12277554, colour: black",
+      "Шорти від LC WAIKIKI - code: S53431Z8/SNE, colour: beige"
+    ]
+  };
+
+  // "?"
+  const itemDetails = {
+    tshirt: [
+      "Матеріал - важка щільна бавовна (Heavyweight cotton). На відміну від лаконічного переду, спина цієї футболки вражає масштабним принтом у стилі епохи Відродження. Два ангели, що грають на арфах, та напис «Kingdom Come» створюють драматичний та мистецький образ.", "Спина цієї футболки – чисте полотно чорного кольору. Гладка поверхня щільного трикотажу підкреслює оверсайз силует та додає образу вуличного стилю. А напис на футболці виконаний у стилізованому рукописному шрифті (схожому на тег-графіті).", "Бавовняна футболка бренду FSDN — внутрішня марка відомої мережі магазинів New Yorker із зухвалим готичним принтом «Chaotic» та написом «ESTD. 1992». Об'ємна текстура літер імітує недбалі нитки або подряпини, що додає їй автентичного гранж-вайбу.", "Легка бавовняна футболка з вертикальним принтом-картиною на грудях. На ній зображені туманні гори та хвойний ліс із мотивуючим написом «Eternal Explorer» (Вічний дослідник).", "Технологічна футболка зі спеціального синтетичного матеріалу, призначена для інтенсивного спорту. Має прихований світловідбиваючий логотип по центру та перфорацію знизу для максимальної вентиляції.", "Класичне тенісне поло зі щільної бавовни піке. Стильний контраст створюють темно-сині смужки на комірі та рукавах, а також мініатюрний фірмовий логотип у вигляді амперсанда &. Спина цього поло виглядає класично, але піднятий комір відкриває цікаву деталь – великий чорний напис «JACK & JONES». Це додає несподіваного акценту та підкреслює брендовий стиль.", "Спортивне поло з еластичного, дихаючого матеріалу (поліестер), який швидко сохне. На грудях лаконічний білий логотип, що нагадує стилізовану голову бика — чудовий вибір для активного дня чи тренувань.", "Виготовлена з м'якої бавовни, по центру — принт «California Marina Club» з вітрильником на хвилях на тлі сонця. Дизайн навіює естетику каліфорнійського серфінгу та морських пригод.","Класична бавовняна футболка з мінімалістичним текстовим принтом «Ericeira» та сонцем. Ерісейра — це відоме рибальське містечко в Португалії, яке вважається світовою столицею серфінгу."
+    ],
+    shorts: [
+      "Важкі оверсайз шорти зі щільної бавовняної двонитки, створені в найкращих традиціях сучасного стрітвіру. Головна фішка — зухвалий білий принт «No Face Club» у поєднанні з готичною геральдикою та крилами, що відсилає до культури андеграунду.", "Бэггі-шорти вільного крою, виконані зі стовідсоткового міцного деніму. Тканина має ефект сильного вибілювання («acid wash»), поверх якого нанесено суцільний лазерний паттерн Y2K-полум'я — ідеальний елемент для об'ємних вуличних образів.", "Технологічні урбан-шорти з гладкого, еластичного трикотажу, який за структурою нагадує преміальний «Tech Fleece». Мінімалістичний мілітарі-колір круто розбавляє задня кишеня з чорною прогумованою вологозахисною блискавкою, додаючи аутдор-вайбу.", "Ультралегкі спортивні шорти з подвійної перфорованої сітки («Mesh»), які прийшли прямо з баскетбольної культури. Контрастні білі смуги по нижньому канту, автентичні бокові розрізи та вільний крій забезпечують абсолютну свободу рухів і максимальний комфорт у спеку.", "Лаконічні та максимально затишні шорти приємного пісочного відтінку, виготовлені з полегшеної дихаючої бавовни. Еластичний пояс на шнурку гарантує ідеальну посадку, роблячи цю пару ідеальною базою для спокійних літніх аутфітів на кожен день."
+    ]
+  };
+
+  function toggleDetails(category){
+    const popup = document.getElementById(`${category}-popup`);
+    if(popup.classList.contains('show')){
+      popup.classList.remove('show');
+      return;
+    }
+    const s = state[category];
+    const text = (itemDetails[category] && itemDetails[category][s.index]) || "Інформації поки немає";
+    popup.textContent = text;
+    popup.classList.add('show');
+  }
+
+  function photoPath(category, index, side){
+    return `photos/${category}_${index + 1}_${side}.${EXT}`;
+  }
+
+  function placeholderSVG(category, index, side){
+    const label = category === 'tshirt' ? 'Футболка' : 'Шорти';
+    const bg = side === 'front' ? '%23f0efea' : '%23e2e0da';
+    const svg = `data:image/svg+xml;utf8,
+      <svg xmlns='http://www.w3.org/2000/svg' width='280' height='340'>
+        <rect width='100%25' height='100%25' fill='${bg}'/>
+        <line x1='0' y1='0' x2='280' y2='340' stroke='%23111113' stroke-opacity='0.06' stroke-width='2'/>
+        <line x1='280' y1='0' x2='0' y2='340' stroke='%23111113' stroke-opacity='0.06' stroke-width='2'/>
+        <text x='50%25' y='45%25' font-family='monospace' font-size='16' fill='%23111113' text-anchor='middle'>${label} ${index + 1}</text>
+        <text x='50%25' y='55%25' font-family='monospace' font-size='13' fill='%237c7c81' text-anchor='middle'>вид: ${side === 'front' ? 'перед' : 'зад'}</text>
+        <text x='50%25' y='90%25' font-family='monospace' font-size='9' fill='%237c7c81' text-anchor='middle'>photos/${category}_${index+1}_${side}.${EXT}</text>
+      </svg>`;
+    return svg.replace(/\n/g,'').replace(/\s+/g,' ');
+  }
+
+  function setImage(imgEl, category, index, side){
+    imgEl.src = photoPath(category, index, side);
+    imgEl.onerror = () => {
+      imgEl.onerror = null;
+      imgEl.src = placeholderSVG(category, index, side);
+    };
+  }
+
+  function buildDots(category){
+    const dotsWrap = document.getElementById(`${category}-dots`);
+    dotsWrap.innerHTML = "";
+    for(let i = 0; i < state[category].count; i++){
+      const dot = document.createElement('button');
+      dot.className = 'dot' + (i === state[category].index ? ' active' : '');
+      dot.setAttribute('aria-label', `Перейти до ${i+1}`);
+      dot.onclick = () => goToIndex(category, i);
+      dotsWrap.appendChild(dot);
+    }
+  }
+
+  function refreshCounter(category){
+    const el = document.getElementById(`${category}-counter`);
+    const s = state[category];
+    const pad = n => String(n).padStart(2, '0');
+    el.textContent = `${pad(s.index + 1)} / ${pad(s.count)}`;
+  }
+
+  function renderItem(category, { skipFlipReset } = {}){
+    const s = state[category];
+    setImage(document.getElementById(`${category}-front-img`), category, s.index, 'front');
+    setImage(document.getElementById(`${category}-back-img`), category, s.index, 'back');
+    refreshCounter(category);
+    buildDots(category);
+
+    const infoEl = document.getElementById(`${category}-info`);
+    const text = (itemInfo[category] && itemInfo[category][s.index]) || "";
+    infoEl.classList.remove('show');
+    setTimeout(() => {
+      infoEl.textContent = text;
+      infoEl.classList.add('show');
+    }, 120);
+
+    document.getElementById(`${category}-popup`).classList.remove('show');
+
+    const card = document.getElementById(`${category}-card`);
+    if(!skipFlipReset){
+      s.flipped = false;
+      card.classList.remove('flipped');
+    }
+  }
+
+  function nextItem(category){
+    const s = state[category];
+    s.index = (s.index + 1) % s.count;
+    bumpCard(category);
+    renderItem(category);
+  }
+
+  function prevItem(category){
+    const s = state[category];
+    s.index = (s.index - 1 + s.count) % s.count;
+    bumpCard(category);
+    renderItem(category);
+  }
+
+  function goToIndex(category, i){
+    state[category].index = i;
+    bumpCard(category);
+    renderItem(category);
+  }
+
+  function bumpCard(category){
+    const card = document.getElementById(`${category}-card`);
+    card.classList.remove('bump');
+    void card.offsetWidth;
+    card.classList.add('bump');
+  }
+
+  function flipCard(category){
+    const s = state[category];
+    s.flipped = !s.flipped;
+    const card = document.getElementById(`${category}-card`);
+    card.classList.toggle('flipped', s.flipped);
+  }
+
+
+  renderItem('tshirt', { skipFlipReset: true });
+  renderItem('shorts', { skipFlipReset: true });
+
+  let musicPlaying = false;
+  function toggleMusic(){
+    const music = document.getElementById('bg-music');
+    const btn = document.getElementById('music-btn');
+    if(musicPlaying){
+      music.pause();
+      btn.textContent = '♪';
+      btn.classList.remove('playing');
+    } else {
+      music.play();
+      btn.textContent = '❚❚';
+      btn.classList.add('playing');
+    }
+    musicPlaying = !musicPlaying;
+  }
+</script>
+
+</body>
+</html>
